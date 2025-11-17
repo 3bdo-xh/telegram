@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timedelta
 import pytz
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 import random
 import time
 import os
@@ -11,7 +12,13 @@ API_ID = 20529343
 API_HASH = "656199efaf0935e731164fb9d02e4aa6"
 SESSION_STRING = "1BJWap1sAUKbAMz0u0rlA2N-DGqdv0nN_Y0mTgWlImj3-l4Q0y1EorS3bap1HwkZOnPuCq7qQ9x5h18e3HNITp0zxEjvo2nYnLfkQ64Xz07npQ3FYaXXjCOfkG8dorysjJ5g3G2WFSPIobFmcrVeNL-4GJ-AQncGxbPHuf5WtqMpi_7ZYq1rX2qitx9ZYM4TL6xSKbyfnEjqTBVp4m3ZJBfDkbU0MuP43l-RPOeRKMC_07KF-rZVYV0eWqfsW_zKXblaBUKVqMDU0ewBFYc9pxNvaqLyn0ZLz3NB8gPd8ygayjNvujLA04CuooUr1RrB_iYW-bc4RDI7sssxZbLYE1RttpiLsz1s="
 
-client = TelegramClient(session=None, api_id=API_ID, api_hash=API_HASH)
+# إنشاء العميل باستخدام StringSession
+client = TelegramClient(
+    session=StringSession(SESSION_STRING),
+    api_id=API_ID, 
+    api_hash=API_HASH
+)
+
 TIMEZONE = pytz.timezone('Africa/Tripoli')  # توقيت ليبيا
 
 # نظام الحماية من Flood
@@ -376,22 +383,25 @@ async def show_scheduled_handler(event):
         await event.reply(f"❌ خطأ في العرض: {e}")
 
 async def main():
-    await client.start(session_string=SESSION_STRING)
-    print("✅ البوت يعمل...")
-    print("📍 توقيت ليبيا (Africa/Tripoli)")
-    print("🕒 نظام الجدولة: من 00:00 إلى 24:00")
-    print("📅 جاهز لجدولة الرسائل")
-    
-    # عرض معلومات عن الأوقات الحالية
-    now = datetime.now(TIMEZONE)
-    time_slots = generate_time_slots()
-    today_slots = generate_time_slots_from_now()
-    
-    print(f"⏰ الوقت الحالي: {now.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"📊 الأوقات المتاحة للجدولة: {len(time_slots)}")
-    print(f"📅 الأوقات المتبقية لليوم: {len(today_slots)}")
-    
-    await client.run_until_disconnected()
+    try:
+        await client.start()
+        print("✅ البوت يعمل...")
+        print("📍 توقيت ليبيا (Africa/Tripoli)")
+        print("🕒 نظام الجدولة: من 00:00 إلى 24:00")
+        print("📅 جاهز لجدولة الرسائل")
+        
+        # عرض معلومات عن الأوقات الحالية
+        now = datetime.now(TIMEZONE)
+        time_slots = generate_time_slots()
+        today_slots = generate_time_slots_from_now()
+        
+        print(f"⏰ الوقت الحالي: {now.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"📊 الأوقات المتاحة للجدولة: {len(time_slots)}")
+        print(f"📅 الأوقات المتبقية لليوم: {len(today_slots)}")
+        
+        await client.run_until_disconnected()
+    except Exception as e:
+        print(f"❌ خطأ في بدء التشغيل: {e}")
 
 if __name__ == '__main__':
     client.loop.run_until_complete(main())
